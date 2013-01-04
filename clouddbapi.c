@@ -30,44 +30,88 @@
 #include <string.h>
 #include <stdint.h>
 
-//#define PORT                5001
-#define IP_ADDR             "192.168.10.197"
+#define IP_ADDR             "192.168.100.233"
 #define MAX_BUF_LEN         1024
 #define ADDR_STR_LEN        128
-#define MAX_NODE_NUM        3
+#define MAX_NODE_NUM        serverList->len
 
 #define debug  printf
               
 typedef struct ServerNode
 {
+	tLNode *pNext;
     char addr[ADDR_STR_LEN];
     int  port;
     int  db;
 }tServerNode;
 
-/* Initialize servers info */
-tServerNode nodes[MAX_NODE_NUM] = 
+/* 
+ * Add a Server to Server List 
+ */
+int addServer(tLinkedList *serverList, char *addr, int port)
 {
-    {IP_ADDR, 5000, -1},
-    {IP_ADDR, 5001, -1},
-    {IP_ADDR, 5002, -1}   
-};
+	tServerNode *pNode = (tServerNode*) malloc(sizeof(tServerNode));
+    memcpy(pNode->addr, addr, strlen(addr) + 1);
+    pNode->port = port;
+    pNode->db = -1;
+    AddLNode(serverList, (tLNode*)pNode);
+    return 0;
+}
+
+/* 
+ * Initialize Server List 
+ */
+static tLinkedList* InitServerList()
+{
+	int i;
+	tLinkedList *serverList = CreateLinkedList();
+	for (i = 0; i < 3; i++)
+	{
+		addServer(serverList, IP_ADDR, 5000 + i);
+	}
+	return serverList;
+}
+
+static tServerNode *FindNode(tLinkedList *serverList, int index)
+{
+    int i = 0;
+    tServerNode *pNode = (tServerNode*)GetLHead(serverList);
+    while (pNode != NULL)
+    {
+        if (i == index)
+        {
+            return pNode;;
+        }
+        pNode = (tServerNode*)GetNextLNode(serverList,(tLNode*)pNode);
+        i++;
+    }
+    return NULL;
+}
+
+int updateServerList(int num, tServerNode *recvList, tServerNode *serverList)
+{
+    return 0;   
+}
+
 
 /*
  * Create an Database
  */
 tDatabase CreateDB(const char *dbName)
 {
-    int i;
-    for(i = 0; i < MAX_NODE_NUM; i++)
+    tLinkedList *serverList = InitServerList();
+    tServerNode *pNode = (tServerNode*)GetLHead(serverList);
+    while (pNode != NULL)
     {
-        nodes[i].db = CreateRemoteDB(nodes[i].addr, nodes[i].port, dbName);
-        if(nodes[i].db == -1)
-        {
-            return NULL;
-        }
-    }      
-    return (tDatabase)nodes;
+    	debug("%s:%d\n", pNode->addr, pNode->port);
+    	pNode->db = CreateRemoteDB(pNode->addr, pNode->port, dbName);
+    	if (pNode->db == -1)
+    	{
+    		return NULL;
+    	}
+    	pNode = (tServerNode*)GetNextLNode(serverList,(tLNode*)pNode);	
+    }     
+    return (tDatabase)serverList;
 }
 
 /*
@@ -75,11 +119,16 @@ tDatabase CreateDB(const char *dbName)
  */
 int CloseDB(tDatabase db)
 {
-    tServerNode *pnodes = (tServerNode*)db;
+	tLinkedList *serverList = (tLinkedList*)db;
+    tServerNode *pNode = (tServerNode*)GetLHead(serverList);
     int i;
-    for(i = 0; i < MAX_NODE_NUM; i++)
+    while (pNode != NULL)
     {    
-        CloseRemoteDB(pnodes[i].db);
+    	if (pNode->db != -1)
+    	{
+        	CloseRemoteDB(pNode->db);
+        }
+        pNode = (tServerNode*)GetNextLNode(serverList,(tLNode*)pNode);
     }
     return 0;
 }
@@ -90,10 +139,11 @@ int CloseDB(tDatabase db)
  */
 int SetRecord(tDatabase db, tKey key, tValue value)
 {
-    tServerNode *pnodes = (tServerNode*)db;
-    int nodeindex = key % MAX_NODE_NUM;/* distribute strategy */
-    debug("key=%d,nodeindex=%d\n", key, nodeindex);
-    return SetRecordRemote(pnodes[nodeindex].db, key, value);
+    tLinkedList *serverList = (tLinkedList*)db;
+    int nodeIndex = key % MAX_NODE_NUM;	/* distribute strategy */
+    tServerNode *pNode = FindNode(serverList, nodeIndex);
+    debug("key=%d,nodeindex=%d\n", key, nodeIndex);
+    return SetRecordRemote(pNode->db, key, value);
 }
 
 /*
@@ -101,10 +151,11 @@ int SetRecord(tDatabase db, tKey key, tValue value)
  */
 int GetRecord(tDatabase db, tKey key, tValue *pvalue)
 {
-    tServerNode *pnodes = (tServerNode*)db;
-    int nodeindex = key % MAX_NODE_NUM;/* distribute strategy */ 
-    debug("key=%d,nodeindex=%d\n", key, nodeindex);  
-    return GetRecordRemote(pnodes[nodeindex].db, key, pvalue);
+    tLinkedList *serverList = (tLinkedList*)db;
+    int nodeIndex = key % MAX_NODE_NUM;	/* distribute strategy */
+    tServerNode *pNode = FindNode(serverList, nodeIndex);
+    debug("key=%d,nodeindex=%d\n", key, nodeIndex); 
+    return GetRecordRemote(pNode->db, key, pvalue);
 }
 
 /*
@@ -112,8 +163,9 @@ int GetRecord(tDatabase db, tKey key, tValue *pvalue)
  */
 int DeleteRecord(tDatabase db, tKey key)
 {
-    tServerNode *pnodes = (tServerNode*)db;
-    int nodeindex = key % MAX_NODE_NUM;/* distribute strategy */ 
-    debug("key=%d,nodeindex=%d\n", key, nodeindex);   
-    return DeleteRecordRemote(pnodes[nodeindex].db, key);
+    tLinkedList *serverList = (tLinkedList*)db;
+    int nodeIndex = key % MAX_NODE_NUM;	/* distribute strategy */
+    tServerNode *pNode = FindNode(serverList, nodeIndex);
+    debug("key=%d,nodeindex=%d\n", key, nodeIndex); 
+    return DeleteRecordRemote(pNode->db, key);  
 }

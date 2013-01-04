@@ -11,7 +11,7 @@ vampireserver:dbapi.o net.o protocol.o dbserver.o queue.o  \
 	gcc -o $@ $^ -ltokyocabinet
 
 # vampireclient:database remote command line
-vampireclient: client.o net.o protocol.o remotedbapi.o clouddbapi.o cmdline.o            
+vampireclient: client.o net.o protocol.o remotedbapi.o linkedlist.o clouddbapi.o cmdline.o            
 	gcc -o $@ $^
 	@printf '#==========================================\n'
 	@printf '# vampire:C/S version\n'
@@ -28,7 +28,8 @@ vampire: dbapi.o cmdline.o client.o
 
 test: dbapi.o testdbapi.o \
 	  net.o testnetserver.o testnetclient.o \
-	  protocol.o testprotocol.o
+	  protocol.o testprotocol.o \
+	  linkedlist.o testlinkedlist.o
 	gcc -o testdbapi dbapi.o testdbapi.o -ltokyocabinet
 	./testdbapi
 	gcc -o testswserver net.o testnetserver.o
