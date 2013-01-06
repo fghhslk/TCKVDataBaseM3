@@ -23,7 +23,7 @@
 int main()
 {
     printf("***************************************************************************\n");
-    printf("****     Welcome to Vampire KV Database system!      ----version 3.0   ****\n");
+    printf("****     Welcome to Vampire KV Database system!      ----version 5.0   ****\n");
     printf("***************************************************************************\n");
     printf("Please type CMDs: (You can type in [help] for help)\n");
     

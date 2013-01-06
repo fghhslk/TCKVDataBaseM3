@@ -25,53 +25,17 @@
 #include "net.h"
 #include "protocol.h"
 #include "linkedlist.h"
+#include "servlistmgr.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 
-#define IP_ADDR             "192.168.100.233"
-#define MAX_BUF_LEN         1024
-#define ADDR_STR_LEN        128
 #define MAX_NODE_NUM        serverList->len
 
 #define debug  printf
-              
-typedef struct ServerNode
-{
-	tLNode *pNext;
-    char addr[ADDR_STR_LEN];
-    int  port;
-    int  db;
-}tServerNode;
 
-/* 
- * Add a Server to Server List 
- */
-int addServer(tLinkedList *serverList, char *addr, int port)
-{
-	tServerNode *pNode = (tServerNode*) malloc(sizeof(tServerNode));
-    memcpy(pNode->addr, addr, strlen(addr) + 1);
-    pNode->port = port;
-    pNode->db = -1;
-    AddLNode(serverList, (tLNode*)pNode);
-    return 0;
-}
-
-/* 
- * Initialize Server List 
- */
-static tLinkedList* InitServerList()
-{
-	int i;
-	tLinkedList *serverList = CreateLinkedList();
-	for (i = 0; i < 3; i++)
-	{
-		addServer(serverList, IP_ADDR, 5000 + i);
-	}
-	return serverList;
-}
-
+/* find the node in linked list */
 static tServerNode *FindNode(tLinkedList *serverList, int index)
 {
     int i = 0;
@@ -88,24 +52,18 @@ static tServerNode *FindNode(tLinkedList *serverList, int index)
     return NULL;
 }
 
-int updateServerList(int num, tServerNode *recvList, tServerNode *serverList)
-{
-    return 0;   
-}
-
-
 /*
  * Create an Database
  */
 tDatabase CreateDB(const char *dbName)
 {
-    tLinkedList *serverList = InitServerList();
+    tLinkedList *serverList = RegisterServer(NULL, 0);
     tServerNode *pNode = (tServerNode*)GetLHead(serverList);
     while (pNode != NULL)
     {
     	debug("%s:%d\n", pNode->addr, pNode->port);
-    	pNode->db = CreateRemoteDB(pNode->addr, pNode->port, dbName);
-    	if (pNode->db == -1)
+    	pNode->fd = CreateRemoteDB(pNode->addr, pNode->port, dbName);
+    	if (pNode->fd == -1)
     	{
     		return NULL;
     	}
@@ -117,16 +75,16 @@ tDatabase CreateDB(const char *dbName)
 /*
  * Delete the Database
  */
-int CloseDB(tDatabase db)
+int CloseDB(tDatabase fd)
 {
-	tLinkedList *serverList = (tLinkedList*)db;
+	tLinkedList *serverList = (tLinkedList*)fd;
     tServerNode *pNode = (tServerNode*)GetLHead(serverList);
     int i;
     while (pNode != NULL)
     {    
-    	if (pNode->db != -1)
+    	if (pNode->fd != -1)
     	{
-        	CloseRemoteDB(pNode->db);
+        	CloseRemoteDB(pNode->fd);
         }
         pNode = (tServerNode*)GetNextLNode(serverList,(tLNode*)pNode);
     }
@@ -137,35 +95,35 @@ int CloseDB(tDatabase db)
 /*
  * Set key/value
  */
-int SetRecord(tDatabase db, tKey key, tValue value)
+int SetRecord(tDatabase fd, tKey key, tValue value)
 {
-    tLinkedList *serverList = (tLinkedList*)db;
+    tLinkedList *serverList = (tLinkedList*)fd;
     int nodeIndex = key % MAX_NODE_NUM;	/* distribute strategy */
     tServerNode *pNode = FindNode(serverList, nodeIndex);
     debug("key=%d,nodeindex=%d\n", key, nodeIndex);
-    return SetRecordRemote(pNode->db, key, value);
+    return SetRecordRemote(pNode->fd, key, value);
 }
 
 /*
  * get key/value
  */
-int GetRecord(tDatabase db, tKey key, tValue *pvalue)
+int GetRecord(tDatabase fd, tKey key, tValue *pvalue)
 {
-    tLinkedList *serverList = (tLinkedList*)db;
+    tLinkedList *serverList = (tLinkedList*)fd;
     int nodeIndex = key % MAX_NODE_NUM;	/* distribute strategy */
     tServerNode *pNode = FindNode(serverList, nodeIndex);
     debug("key=%d,nodeindex=%d\n", key, nodeIndex); 
-    return GetRecordRemote(pNode->db, key, pvalue);
+    return GetRecordRemote(pNode->fd, key, pvalue);
 }
 
 /*
  * delete key/value
  */
-int DeleteRecord(tDatabase db, tKey key)
+int DeleteRecord(tDatabase fd, tKey key)
 {
-    tLinkedList *serverList = (tLinkedList*)db;
+    tLinkedList *serverList = (tLinkedList*)fd;
     int nodeIndex = key % MAX_NODE_NUM;	/* distribute strategy */
     tServerNode *pNode = FindNode(serverList, nodeIndex);
     debug("key=%d,nodeindex=%d\n", key, nodeIndex); 
-    return DeleteRecordRemote(pNode->db, key);  
+    return DeleteRecordRemote(pNode->fd, key);  
 }

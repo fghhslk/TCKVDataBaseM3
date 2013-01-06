@@ -32,6 +32,11 @@ int main(int argc, char **argv)
     tValue getvalue;
     printf(">>>>> Test dbapi: Basic Use Case <<<<<\n");
     tDatabase db = CreateDB("vampire.hdb");
+    if(db == NULL)
+    {
+    	fprintf(stderr, "CreateDB error: %d:%s\n");	
+        return -1;
+    }
     key = 1;
     setvalue.str = "hello world!";
     setvalue.len = strlen(setvalue.str);
@@ -40,6 +45,7 @@ int main(int argc, char **argv)
     if(ret == FAILURE)
     {
         fprintf(stderr, "set error: %d:%s\n", key, setvalue.str);
+        return -1;
     }
     printf("set %d:\"%s\" successfully!\n", key, setvalue.str);
     getvalue.str = buf;
@@ -48,6 +54,7 @@ int main(int argc, char **argv)
     if(ret == FAILURE)
     {
         fprintf(stderr, "get error: %d\n", key);
+        return -1;
     }
     printf("get %d:\"%s\" successfully!\n", key, getvalue.str);
     ret = memcmp(getvalue.str, setvalue.str, getvalue.len);
@@ -63,6 +70,7 @@ int main(int argc, char **argv)
     if(ret == FAILURE)
     {
         fprintf(stderr, "delete error: %d\n",key);
+        return -1;
     }
     CloseDB(db);
     return;

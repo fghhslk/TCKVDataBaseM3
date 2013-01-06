@@ -1,28 +1,29 @@
+
 /********************************************************************/
-/* Copyright (C) SSE-USTC, 2012 */
-/* */
-/* FILE NAME : testprotocol.c */
-/* PRINCIPAL AUTHOR : Mengning */
-/* SUBSYSTEM NAME : network */
-/* MODULE NAME : protocol */
-/* LANGUAGE : C */
-/* TARGET ENVIRONMENT : Linux */
-/* DATE OF FIRST RELEASE : 2012/12/18 */
-/* DESCRIPTION : Protocol between Nezha Sever and Client*/
+/* Copyright (C) SSE-USTC, 2012                                     */
+/*                                                                  */
+/*  FILE NAME             :  testprotocol.c                         */
+/*  PRINCIPAL AUTHOR      :  Mengning                               */
+/*  SUBSYSTEM NAME        :  network                                */
+/*  MODULE NAME           :  protocol                               */
+/*  LANGUAGE              :  C                                      */
+/*  TARGET ENVIRONMENT    :  Linux                                  */
+/*  DATE OF FIRST RELEASE :  2012/12/18                             */
+/*  DESCRIPTION           :  Protocol between Nezha Sever and Client*/
 /********************************************************************/
 
 /*
-* Revision log:
-*
-* Created by Mengning,2012/12/18
-*
-*/
+ * Revision log:
+ *
+ * Created by Mengning,2012/12/18
+ *
+ */
 #include "protocol.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
 #include <string.h>
 
-#define MAX_BUF_LEN 1024
+#define MAX_BUF_LEN         1024
 
 int main()
 {
@@ -63,5 +64,33 @@ int main()
         printf("%s\n",Data2);
         printf("Test Two Data Result: Pass\n");
     }
-    return 0;
+    char ppData[10][MAX_DATA_LEN] = 
+    {
+        {"127.0.0.1:5001"},
+        {"127.0.0.2:5002"},
+        {"127.0.0.3:5003"},
+        {"127.0.0.4:5004"},
+        {"127.0.0.5:5005"},
+        {"127.0.0.6:5006"},
+        {"127.0.0.7:5007"},
+        {"127.0.0.8:5008"},
+        {"127.0.0.9:5009"},
+        {"127.0.0.10:5010"}
+    };
+    char ppData1[10][MAX_DATA_LEN] = {0};
+    BufSize = MAX_BUF_LEN;
+    FormatDataN(Buf,&BufSize,CTRL_REG_RSP,ppData,10);
+    DataNum = 0;
+    ParseDataN(Buf,MAX_BUF_LEN,&cmd,&DataNum,ppData1);
+    printf("CMD:%d,DataNum:%d\n",cmd,DataNum);
+    int i = 0;
+    for(i=0;i<10;i++)
+    {
+        printf("%s\n",ppData1[i]);
+    }
+
+    return 0;   
 }
+
+
+

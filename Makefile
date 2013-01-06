@@ -6,12 +6,14 @@ TARGETS = testdbapi testswserver testswclient testprotocol \
 all: vampire vampireserver vampireclient
 
 # vampireserver:database service
-vampireserver:dbapi.o net.o protocol.o dbserver.o queue.o  \
-              event.o cmdline.o
+vampireserver:dbapi.o net.o protocol.o engine.o server.o   \
+			  queue.o event.o cmdline.o linkedlist.o       \
+			  servlistmgr.o
 	gcc -o $@ $^ -ltokyocabinet
 
 # vampireclient:database remote command line
-vampireclient: client.o net.o protocol.o remotedbapi.o linkedlist.o clouddbapi.o cmdline.o            
+vampireclient: client.o net.o protocol.o remotedbapi.o     \
+			   linkedlist.o servlistmgr.o clouddbapi.o cmdline.o            
 	gcc -o $@ $^
 	@printf '#==========================================\n'
 	@printf '# vampire:C/S version\n'

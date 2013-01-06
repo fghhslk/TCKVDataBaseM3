@@ -34,7 +34,7 @@ typedef int tServiceHandler;
 * return : if SUCCESS return 0
 * : if FAILURE return (-1)
 */
-int InitializeNetService(short int port);
+int InitializeNetService(char *addr, short int port);
 int ShutdownNetService();
 /*
 * OpenRemoteService - Only used in Client side,it connects Server.
@@ -84,7 +84,7 @@ int ServiceStop(tServiceHandler h);
 * : if FAILURE return (-1)
 * : if Connection Terminals return 0
 */
-int SendData(tServiceHandler h, char * pBuf, int BufSize);
+int SendData(tServiceHandler h, char *pBuf, int BufSize);
 /*
 * SendData - send data to peer side
 * input : h - it MUST BE what ServiceStart or OpenRemoteService returns.
@@ -94,7 +94,14 @@ int SendData(tServiceHandler h, char * pBuf, int BufSize);
 * : if FAILURE return (-1)
 * : if Connection Terminals return 0
 */
-int RecvData(tServiceHandler h, char * pBuf, int *pBufSize);
-
+int RecvData(tServiceHandler h, char *pBuf, int *pBufSize);
+/*
+* GetSelfAddr - get local IP address
+* input : None
+* output : None
+* in/out : None
+* return : IP address
+*/
+char* GetSelfAddr();
         
 #endif /* _NET_H_ */
