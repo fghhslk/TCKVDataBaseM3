@@ -28,8 +28,10 @@
 int ServiceEngine(char *addr, int port);
 /* create cluster in master */
 int CreateCluster(char *addr, int port);
-/* loading cluster nodes in nodes */
+/* loading cluster nodes in list */
 int LoadingClusterNodes(char *addr, int port);
+/* unloading cluster nodes from list */
+int UnLoadingClusterNodes(char *addr, int port);
 
 #endif /* _ENGINE_H_ */
 

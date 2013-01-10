@@ -77,7 +77,8 @@ int CloseRemoteDB(int db)
     char Buf[MAX_BUF_LEN] = "\0";
     int BufSize = MAX_BUF_LEN;
     FormatData(Buf, &BufSize, CLOSE_CMD);
-    SendData(*(tServiceHandler*)db, Buf, BufSize);
+    //SendData(*(tServiceHandler*)db, Buf, BufSize);
+    SendData(db, Buf, BufSize);
     BufSize = MAX_BUF_LEN;
     if(RecvData(db, Buf, &BufSize) == 0)
     {

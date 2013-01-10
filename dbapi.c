@@ -106,7 +106,7 @@ int CloseDB(tDatabase db)
         char *dbName = (char*)tcmdbiternext(allOpenedDB, &ksize);
         if (dbName == NULL)
         {
-            fprintf(stderr, "DBDelete:Can't find the database,%s:%d\n", __FILE__, __LINE__);
+            fprintf(stderr, "CloseDB:Can't find the database,%s:%d\n", __FILE__, __LINE__);
             break;
         }
         int sp = -1;

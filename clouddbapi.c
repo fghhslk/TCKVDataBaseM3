@@ -46,7 +46,7 @@ static tServerNode *FindNode(tLinkedList *serverList, int index)
         {
             return pNode;;
         }
-        pNode = (tServerNode*)GetNextLNode(serverList,(tLNode*)pNode);
+        pNode = (tServerNode*)GetNextLNode(serverList, (tLNode*)pNode);
         i++;
     }
     return NULL;
@@ -79,14 +79,15 @@ int CloseDB(tDatabase fd)
 {
 	tLinkedList *serverList = (tLinkedList*)fd;
     tServerNode *pNode = (tServerNode*)GetLHead(serverList);
-    int i;
+    //printf("remote db closing\n");
     while (pNode != NULL)
     {    
     	if (pNode->fd != -1)
     	{
         	CloseRemoteDB(pNode->fd);
+        	printf("remote db closed\n");
         }
-        pNode = (tServerNode*)GetNextLNode(serverList,(tLNode*)pNode);
+        pNode = (tServerNode*)GetNextLNode(serverList, (tLNode*)pNode);
     }
     return 0;
 }

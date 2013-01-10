@@ -60,7 +60,7 @@ int epollfd = -1;
             fprintf(stderr,"Bind Error,%s:%d\n",        \
                 __FILE__,__LINE__);                     \
             close(sockfd);                              \
-            exit(-1);			                        \
+            return -1; 			                        \
         }                                               \
         listen(sockfd,MAX_CONNECT_QUEUE);
 
@@ -74,7 +74,7 @@ int epollfd = -1;
                 __FILE__, __LINE__);                    \
             exit(-1);                                   \
         }                                               \
-        debug("connected\n");
+        //debug("connected\n");
 
 char* GetSelfAddr()
 {

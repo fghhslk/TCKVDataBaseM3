@@ -38,10 +38,17 @@ typedef struct ServerNode
 
 /* Init server list info */
 tLinkedList* InitServerList(char* addr, int port);
+//tLinkedList* InitServerList();
 /* Register And Load serverList info */
 tLinkedList* RegisterServer(char* addr, int port);
+/* delete a server node from linked list */
+int RevokeServer(char *addr, int port);
+/* search a server node from linked list */
+tLNode* SearchServerFunc(tLinkedList *pLinkedList, tLNode *pNode);
 /* add recved buf(serverList info) to linked list */
 int AddServer(tLinkedList *serverList, char ppData[MAX_DATA_NUM][MAX_DATA_LEN], int DataNum);
+/* del recved buf(serverList info) from linked list */
+int DelServer(tLinkedList *serverList, char ppData[MAX_DATA_NUM][MAX_DATA_LEN], int DataNum);
 /* LinkedList(server info) to ppData array */
 int PackServer(tLinkedList *serverList, char ppData[MAX_DATA_NUM][MAX_DATA_LEN], int *NodeNum);
 

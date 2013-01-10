@@ -34,7 +34,7 @@
 
 #define MAX_BUF_LEN     1024
 
-#define debug	printf
+#define debug		printf
 
 #define MAX_TASK_NUM      0
 pthread_t thread_id[MAX_TASK_NUM];
@@ -99,26 +99,17 @@ int ServiceEngine(char *addr, int port)
     InitCDManager();
     /* Server Engine for Clients' Requests */
     tServiceHandler request = -1;
-    /*short int step = 0;
-    while (1)
-    {
-    	port += step;
-    	debug("port:%d\n", port);
-    	if (InitializeNetService(addr, port) != -1)
-    		break;
-    	step++;
-    }
-	if (strcmp(addr, "127.0.0.1") != 0 && port != 6000)
-    	LoadingClusterNodes(addr, port);*/
-    InitializeNetService(addr, port);
+    debug("port:%d\n", port);
+    if (InitializeNetService(addr, port) == -1)
+    	return -1;
     printf("InitializeNetService at %s:%d\n", addr, port);
     while (1)
     {
         /* return the client fd who have real data request */
         request = ServiceStart();
-        tTaskNode *pnode = malloc(sizeof(tTaskNode));
-        pnode->BufSize = MAX_BUF_LEN;
-        if (RecvData(request, pnode->Buf, &(pnode->BufSize)) == 0)
+        tTaskNode *pNode = malloc(sizeof(tTaskNode));
+        pNode->BufSize = MAX_BUF_LEN;
+        if (RecvData(request, pNode->Buf, &(pNode->BufSize)) == 0)
         {
             /* close by peer */
             ServiceStop(request);
@@ -126,16 +117,16 @@ int ServiceEngine(char *addr, int port)
         }        
         if (MAX_TASK_NUM > 0)
         {            
-            pnode->req = request;
+            pNode->req = request;
             RANDOM(MAX_TASK_NUM);	//i = random(MAX_TASK_NUM)
             debug("fd %d send to task %d\n", request, i);
-            QueueInMsg(&taskq[i], (QueueNode*)pnode);
+            QueueInMsg(&taskq[i], (QueueNode*)pNode);
             SentEvent(&event[i]);
         }
         else
         {
-            Handler(request, pnode->Buf, pnode->BufSize);
-            free(pnode);
+            Handler(request, pNode->Buf, pNode->BufSize);
+            free(pNode);
         }  
     }
     ShutdownNetService();
@@ -170,15 +161,15 @@ int HandleRequests(int tasknum)
     {
         WaitEvent(&event[i]);
         debug("task %d get a event\n",i);
-        tTaskNode *pnode = NULL;
-        QueueOut(&taskq[i], (QueueNode**)&pnode);
-        h = pnode->req; 
-        if(Handler(h, pnode->Buf, pnode->BufSize) == -1)
+        tTaskNode *pNode = NULL;
+        QueueOut(&taskq[i], (QueueNode**)&pNode);
+        h = pNode->req; 
+        if(Handler(h, pNode->Buf, pNode->BufSize) == -1)
         {
-            free(pnode);
+            free(pNode);
             continue;
         }
-        free(pnode);
+        free(pNode);
     }
 }
 int Handler(tServiceHandler h, char *Buf, int BufSize)
@@ -356,6 +347,19 @@ int HandleControlRequest(tServiceHandler h, char *Buf, int BufSize)
         FormatDataN(Buf, &BufSize, CTRL_REG_RSP, ppData, NodeNum);
         SendData(h, Buf, BufSize);         
     }
+    else if (cmd == CTRL_RVK_CMD && (DataNum == 1 || DataNum == 0))
+    {
+        debug("CTRL_RVK_CMD\n");
+        if (DataNum == 1)
+        {
+            DelServer(gServerList, ppData, DataNum);       
+        }
+        int NodeNum = MAX_DATA_NUM;
+        PackServer(gServerList, ppData, &NodeNum);       
+        BufSize = MAX_BUF_LEN;
+        FormatDataN(Buf, &BufSize, CTRL_RVK_RSP, ppData, NodeNum);
+        SendData(h, Buf, BufSize);         
+    }
     else
     {
         ErrorResponse(h, "Unknow Request!\n");
@@ -374,5 +378,11 @@ int CreateCluster(char *addr, int port)
 int LoadingClusterNodes(char *addr, int port)
 {
     gServerList = RegisterServer(addr, port);
+    return 0;
+}
+
+int UnLoadingClusterNodes(char *addr, int port)
+{
+    RevokeServer(addr, port);
     return 0;
 }

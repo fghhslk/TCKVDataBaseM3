@@ -129,13 +129,13 @@ int DelLNode(tLinkedList *pLinkedList, tLNode *pNode)
  * Search a LNode from LinkedList
  * tLNode * CmpFn(tLinkedList *pLinkedList);
  */
-tLNode *SearchLNode(tLinkedList *pLinkedList, tLNode *CmpFunc(tLinkedList *pLinkedList))
+tLNode *SearchLNode(tLinkedList *pLinkedList, tLNode *pNode, SearchFunc Search)
 {
-    if (pLinkedList == NULL || CmpFunc == NULL)
+    if (Search == NULL)
 	{
 		return NULL;
     }
-    return CmpFunc(pLinkedList);
+    return Search(pLinkedList, pNode);
 }
 
 /*

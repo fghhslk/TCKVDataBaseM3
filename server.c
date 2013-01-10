@@ -36,10 +36,7 @@
 #define PORT                6000
 #define IP_ADDR             "127.0.0.1"
 
-
 #define debug           printf
-
-
 
 int main(int argc, char *argv[])
 {
@@ -53,13 +50,21 @@ int main(int argc, char *argv[])
         addr = IP_ADDR;
         port = PORT;
         CreateCluster(addr, port);
+        ServiceEngine(addr, port);
     }
     else
     {
+    	int i;
 	    addr = GetSelfAddr();
-	    port = atoi(argv[1]);
-	    //port = 5000;    
-	    LoadingClusterNodes(addr, port);
+	    //port = atoi(argv[1]);
+	    port = 5000;
+	    for (i = 0; i < 100; i++)
+	    {
+	    	LoadingClusterNodes(addr, port + i);
+	    	if (ServiceEngine(addr, port + i) == -1)
+	    		/* Delete Wrong Server Node */
+	    		UnLoadingClusterNodes(addr, port + i);
+		}
 	}
     /* start command line console */
     /*pthread_t cmdline_id;
@@ -68,6 +73,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "cmdline pthread_create Error,%s:%d\n", __FILE__, __LINE__);
         exit(-1);
     }*/
-    ServiceEngine(addr, port);
+    //ServiceEngine(addr, port);
     return 0;
 }

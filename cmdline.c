@@ -108,6 +108,7 @@ int ExecCmd(char * cmdbuf)
         if(db != NULL)
         {
             CloseDB(db);
+            printf("closed\n");
             db = NULL;
         }
         dbname[0] = '\0';
@@ -119,7 +120,7 @@ int ExecCmd(char * cmdbuf)
             CloseDB(db);
             dbname[0] = '\0';
         }
-        exit(0);
+        return 0;
     }
     else if(CheckCmd(cmdbuf, "set\\s*[0-9]+\\s*.*") == 0)
     {

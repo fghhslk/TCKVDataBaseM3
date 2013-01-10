@@ -41,6 +41,7 @@ typedef struct LinkedList
 	
 }tLinkedList;
 
+typedef tLNode* (*SearchFunc)(tLinkedList *pLinkedList, tLNode *pNode);
 /*
  * Create a LinkedList
  */
@@ -59,9 +60,9 @@ int AddLNode(tLinkedList *pLinkedList, tLNode *pNode);
 int DelLNode(tLinkedList *pLinkedList, tLNode * pNode);
 /*
  * Search a LNode from LinkedList
- * tLNode * CmpFn(tLinkedList *pLinkTable);
+ * tLNode * SearchFunc(tLinkedList *pLinkedList, tLNode *pNode)
  */
-tLNode *SearchLNode(tLinkedList *pLinkTable, tLNode *CmpFunc(tLinkedList *pLinkTable));
+tLNode *SearchLNode(tLinkedList *pLinkedList, tLNode *pNode, SearchFunc Search);
 /*
  * get LinkTableHead
  */

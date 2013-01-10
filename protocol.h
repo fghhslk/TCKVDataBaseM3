@@ -59,7 +59,9 @@
 #define CTRL_CMD          100          /* Control cmd starts here */
 /* Registe Node info */
 #define CTRL_REG_CMD      101          /* with zero or one data(IP:PORT) */
+#define CTRL_RVK_CMD      102          /* with zero or one data(IP:PORT) */
 #define CTRL_REG_RSP      CTRL_REG_CMD /* with N data(IP:PORT) */
+#define CTRL_RVK_RSP	  CTRL_RVK_CMD /* with N data(IP:PORT) */
 
 #define MAX_DATA_NUM        128
 #define MAX_DATA_LEN        128
