@@ -3,7 +3,7 @@
 /* Copyright (C) SSE-USTC, 2012                                     */
 /*                                                                  */
 /*  FILE NAME             :  testprotocol.c                         */
-/*  PRINCIPAL AUTHOR      :  Mengning                               */
+/*  PRINCIPAL AUTHOR      :  SLK                                    */
 /*  SUBSYSTEM NAME        :  network                                */
 /*  MODULE NAME           :  protocol                               */
 /*  LANGUAGE              :  C                                      */
@@ -15,7 +15,7 @@
 /*
  * Revision log:
  *
- * Created by Mengning,2012/12/18
+ * Created by SLK,2012/12/18
  *
  */
 #include "protocol.h"

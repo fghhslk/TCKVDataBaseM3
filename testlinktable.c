@@ -8,14 +8,14 @@
 /*  MODULE NAME           :  LinkedList                             */
 /*  LANGUAGE              :  C                                      */
 /*  TARGET ENVIRONMENT    :  ANY                                    */
-/*  DATE OF FIRST RELEASE :  2012/1/2                               */
+/*  DATE OF FIRST RELEASE :  2013/1/2                               */
 /*  DESCRIPTION           :  test of Linked List                    */
 /********************************************************************/
 
 /*
  * Revision log:
  *
- * Created by SLK,2012/1/2
+ * Created by SLK,2013/1/2
  *
  */
 

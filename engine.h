@@ -7,7 +7,7 @@
 /*  MODULE NAME             :  engine                               */
 /*  LANGUAGE                :  C                                    */
 /*  TARGET ENVIRONMENT      :  Linux                                */
-/*  DATE OF FIRST RELEASE   :  2012/1/4                             */
+/*  DATE OF FIRST RELEASE   :  2013/1/4                             */
 /*  DESCRIPTION             :  Impement of Socket Server Engine     */
 /*                             to handle clients requests.          */
 /********************************************************************/
@@ -15,7 +15,7 @@
 /*
  * Revision log:
  *
- * Created by SLK,2012/1/4
+ * Created by SLK,2013/1/4
  *
  */
 
